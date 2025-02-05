@@ -8,7 +8,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { Observable, combineLatest } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { filter, take, finalize } from 'rxjs/operators';
 
 import { ProductService, Product } from '../../services/product.service';
 
@@ -27,7 +27,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   constructor(private readonly productService: ProductService) {}
 
   ngOnInit(): void {
-    this.products$ = this.productService.getProducts();
+    this.productService.setLoading(true);
+    this.products$ = this.productService.getProducts().pipe(
+      finalize(() => {
+        this.productService.setLoading(false);
+      }),
+    );
     this.selectedProductId$ = this.productService.selectedProductId$;
   }
 

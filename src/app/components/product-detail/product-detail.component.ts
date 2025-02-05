@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Observable, switchMap, map } from 'rxjs';
+import { Observable, switchMap, map, finalize, of } from 'rxjs';
 
 import { ProductService, Product } from '../../services/product.service';
 
@@ -14,20 +14,26 @@ import { ProductService, Product } from '../../services/product.service';
 export class ProductDetailComponent implements OnInit {
   selectedProduct$!: Observable<Product | null>;
   isOpen$!: Observable<boolean>;
+  isDetailLoading = false;
 
   constructor(private readonly productService: ProductService) {}
 
   ngOnInit(): void {
+    this.isOpen$ = this.productService.selectedProductId$.pipe(map(id => id !== null));
+
     this.selectedProduct$ = this.productService.selectedProductId$.pipe(
       switchMap(id => {
         if (id === null) {
-          return new Observable<null>(subscriber => subscriber.next(null));
+          return of(null);
         }
-        return this.productService.getProduct(id);
+        this.isDetailLoading = true;
+        return this.productService.getProduct(id).pipe(
+          finalize(() => {
+            this.isDetailLoading = false;
+          }),
+        );
       }),
     );
-
-    this.isOpen$ = this.productService.selectedProductId$.pipe(map(id => id !== null));
   }
 
   closeDetail(): void {

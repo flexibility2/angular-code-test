@@ -1,4 +1,7 @@
 <div class="product-detail" [class.open]="isOpen$ | async">
+  <div *ngIf="isDetailLoading" class="detail-loading">
+    <div class="loading-spinner"></div>
+  </div>
   <div class="detail-content" *ngIf="selectedProduct$ | async as product">
     <button class="close-button" (click)="closeDetail()">×</button>
     <div class="product-image">

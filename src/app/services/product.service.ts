@@ -18,6 +18,8 @@ export class ProductService {
   private apiUrl = 'https://fakestoreapi.com/products';
   private selectedProductIdSubject = new BehaviorSubject<number | null>(null);
   selectedProductId$ = this.selectedProductIdSubject.asObservable();
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  isLoading$ = this.isLoadingSubject.asObservable();
 
   // Mock数据
   private mockProducts: Product[] = [
@@ -92,5 +94,9 @@ export class ProductService {
     } else {
       localStorage.removeItem('selectedProductId');
     }
+  }
+
+  setLoading(loading: boolean): void {
+    this.isLoadingSubject.next(loading);
   }
 }
