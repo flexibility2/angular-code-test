@@ -1,7 +1,9 @@
 <div class="product-list">
   <div
-    class="product-item"
     *ngFor="let product of products$ | async"
+    [id]="'product-' + product.id"
+    class="product-item"
+    #productItem
     (click)="selectProduct(product.id)"
     [class.selected]="(selectedProductId$ | async) === product.id"
   >
