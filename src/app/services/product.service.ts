@@ -57,13 +57,7 @@ export class ProductService {
     },
   ];
 
-  constructor(private readonly http: HttpClient) {
-    // 从 localStorage 恢复选中的商品 ID
-    const savedProductId = localStorage.getItem('selectedProductId');
-    if (savedProductId) {
-      this.selectedProductIdSubject.next(Number(savedProductId));
-    }
-  }
+  constructor(private readonly http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl).pipe(
@@ -89,11 +83,6 @@ export class ProductService {
 
   setSelectedProductId(id: number | null): void {
     this.selectedProductIdSubject.next(id);
-    if (id) {
-      localStorage.setItem('selectedProductId', id.toString());
-    } else {
-      localStorage.removeItem('selectedProductId');
-    }
   }
 
   setLoading(loading: boolean): void {

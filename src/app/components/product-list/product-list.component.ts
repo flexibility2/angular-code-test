@@ -7,6 +7,7 @@ import {
   ElementRef,
   AfterViewInit,
 } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
 import { filter, take, finalize } from 'rxjs/operators';
 
@@ -22,9 +23,14 @@ import { ProductService, Product } from '../../services/product.service';
 export class ProductListComponent implements OnInit, AfterViewInit {
   products$!: Observable<Product[]>;
   selectedProductId$!: Observable<number | null>;
+
   @ViewChildren('productItem') productItems!: QueryList<ElementRef>;
 
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.productService.setLoading(true);
@@ -34,6 +40,14 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       }),
     );
     this.selectedProductId$ = this.productService.selectedProductId$;
+
+    // get the selected product ID from the URL parameter
+    this.route.params.subscribe(params => {
+      const productId = params['id'];
+      if (productId) {
+        this.productService.setSelectedProductId(Number(productId));
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -56,5 +70,7 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   selectProduct(id: number): void {
     this.productService.setSelectedProductId(id);
+    // update the URL
+    this.router.navigate(['products', id]);
   }
 }
