@@ -18,10 +18,8 @@ export class ProductService {
   private apiUrl = 'https://fakestoreapi.com/products';
   private selectedProductIdSubject = new BehaviorSubject<number | null>(null);
   selectedProductId$ = this.selectedProductIdSubject.asObservable();
-  private isLoadingSubject = new BehaviorSubject<boolean>(false);
-  isLoading$ = this.isLoadingSubject.asObservable();
 
-  // Mock数据
+  // Mock data
   private mockProducts: Product[] = [
     {
       id: 1,
@@ -62,7 +60,7 @@ export class ProductService {
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.warn('API调用失败，使用mock数据', error);
+        console.warn('api failed, use mock data', error);
         return of(this.mockProducts);
       }),
     );
@@ -71,10 +69,10 @@ export class ProductService {
   getProduct(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.warn('API调用失败，使用mock数据', error);
+        console.warn('api failed, use mock data', error);
         const mockProduct = this.mockProducts.find(p => p.id === id);
         if (!mockProduct) {
-          throw new Error('找不到商品');
+          throw new Error('no data');
         }
         return of(mockProduct);
       }),
@@ -83,9 +81,5 @@ export class ProductService {
 
   setSelectedProductId(id: number | null): void {
     this.selectedProductIdSubject.next(id);
-  }
-
-  setLoading(loading: boolean): void {
-    this.isLoadingSubject.next(loading);
   }
 }

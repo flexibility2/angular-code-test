@@ -23,7 +23,7 @@ import { ProductService, Product } from '../../services/product.service';
 export class ProductListComponent implements OnInit, AfterViewInit {
   products$!: Observable<Product[]>;
   selectedProductId$!: Observable<number | null>;
-
+  loading = true;
   @ViewChildren('productItem') productItems!: QueryList<ElementRef>;
 
   constructor(
@@ -33,15 +33,14 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.setLoading(true);
+    this.loading = true;
     this.products$ = this.productService.getProducts().pipe(
       finalize(() => {
-        this.productService.setLoading(false);
+        this.loading = false;
       }),
     );
     this.selectedProductId$ = this.productService.selectedProductId$;
 
-    // get the selected product ID from the URL parameter
     this.route.params.subscribe(params => {
       const productId = params['id'];
       if (productId) {
@@ -51,11 +50,11 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // 等待商品数据加载完成和选中ID都准备好
+    // wait data is loaded
     combineLatest([this.products$, this.selectedProductId$, this.productItems.changes])
       .pipe(
         filter(([products, id]) => products.length > 0 && id !== null),
-        take(1), // 只执行一次
+        take(1), // only run once
       )
       .subscribe(([_, id]) => {
         const element = this.productItems.find(item => item.nativeElement.id === `product-${id}`);
